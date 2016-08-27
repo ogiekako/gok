@@ -18,8 +18,24 @@ public class Main {
                     "syscall",
                     "li $v0, 10",
                     "syscall");
+        } else if (input.contains("+")) {
+            String[] ss = input.split("\\+");
+            int a = Integer.parseInt(ss[0]);
+            int b = Integer.parseInt(ss[1]);
+
+            output(".data",
+                    "out_string: .asciiz \"" + input + "\"",
+                    ".text",
+                    "main:",
+                    "li $v0, 1",            // syscall 1: print_int
+                    "li $a0, " + a,
+                    "li $a1, " + b,
+                    "add $a0, $a0, $a1",
+                    "syscall",
+                    "li $v0, 10",
+                    "syscall");
         } else {
-            long n = Long.valueOf(input);
+            int n = Integer.parseInt(input);
             output(".data",
                     "out_string: .asciiz \"" + input + "\"",
                     ".text",

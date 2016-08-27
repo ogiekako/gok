@@ -3,10 +3,12 @@
 - [Compiler video lecture](https://www.youtube.com/playlist?list=PLFB9EC7B8FE963EB8)
 - [MIPS instruction](http://logos.cs.uic.edu/366/notes/mips%20quick%20tutorial.htm)
 - [MIPS assebmly language](https://en.wikipedia.org/wiki/MIPS_instruction_set#MIPS_assembly_language)
-  - [Integer](https://en.wikipedia.org/wiki/MIPS_instruction_set#Integer)
-  - [Floating point](https://en.wikipedia.org/wiki/MIPS_instruction_set#Floating_point)
-  - [Pseudo instructions](https://en.wikipedia.org/wiki/MIPS_instruction_set#Pseudo_instructions)
-  - [Other instructions](https://en.wikipedia.org/wiki/MIPS_instruction_set#Other_instructions)
+  - [Register](https://en.wikipedia.org/wiki/MIPS_instruction_set#Compiler_register_usage)
+  - Instructions
+    - [Integer](https://en.wikipedia.org/wiki/MIPS_instruction_set#Integer)
+    - [Floating point](https://en.wikipedia.org/wiki/MIPS_instruction_set#Floating_point)
+    - [Pseudo instructions](https://en.wikipedia.org/wiki/MIPS_instruction_set#Pseudo_instructions)
+    - [Other instructions](https://en.wikipedia.org/wiki/MIPS_instruction_set#Other_instructions)
 
 # 日記
 
