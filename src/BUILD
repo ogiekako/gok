@@ -2,9 +2,13 @@ java_binary(
     name="Main",
     srcs=["Main.java"],
     main_class="Main",
-    deps=["Debug"],
+    deps=["Debug","Ast"],
 )
 java_library(
     name="Debug",
     srcs=["Debug.java"],
+)
+java_library(
+    name="Ast",
+    srcs=["Ast.java"],
 )

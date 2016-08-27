@@ -5,6 +5,7 @@ set -e
 function test() {
   input="$1"
   expected="$2"
+  echo "testing: $input" 1>&2
 
   echo -n "$input" | bazel-bin/src/Main > /tmp/out.s
   spim -file /tmp/out.s 2> /tmp/err | tail -n +2 > /tmp/actual
