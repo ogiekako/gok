@@ -1,0 +1,10 @@
+java_binary(
+    name="Main",
+    srcs=["Main.java"],
+    main_class="Main",
+    deps=["Debug"],
+)
+java_library(
+    name="Debug",
+    srcs=["Debug.java"],
+)
