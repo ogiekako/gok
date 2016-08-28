@@ -3,7 +3,7 @@ public class Ast {
     Kind kind;
     Ast fst;
     Ast snd;
-    Object value;
+    Object value; // Excludes '"' for Str.
     String id;
 
     private Ast(Type t, Kind kind, Ast fst, Ast snd, Object value) {
@@ -18,11 +18,17 @@ public class Ast {
     public static Ast opAddInt(Ast fst, Ast snd) {
         return new Ast(Type.Int, Kind.OpAddInt, fst, snd, null);
     }
-    public static Ast valueInt(int n) {
-        return new Ast(Type.Int, Kind.ValueInt, null, null, n);
+    public static Ast opMulInt(Ast fst, Ast snd) {
+        return new Ast(Type.Int, Kind.OpMulInt, fst, snd, null);
     }
-    public static Ast valueString(String s) {
-        return new Ast(Type.String, Kind.ValueString, null, null, s);
+    public static Ast valInt(int n) {
+        return new Ast(Type.Int, Kind.ValInt, null, null, n);
+    }
+    public static Ast valStr(String s) {
+        return new Ast(Type.Str, Kind.ValStr, null, null, s);
+    }
+    public static Ast unMinusInt(Ast fst) {
+        return new Ast(Type.Int, Kind.UnMinusInt, fst, null, null);
     }
 
     private static int global_id = 1;
@@ -30,11 +36,13 @@ public class Ast {
 
 enum Type {
     Int,
-    String,
+    Str,
 }
 
 enum Kind {
-    ValueInt,
-    ValueString,
+    ValInt,
+    ValStr,
     OpAddInt,
+    OpMulInt,
+    UnMinusInt,
 }

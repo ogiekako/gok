@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -6,22 +7,10 @@ public class Main {
         new Main().compile(input);
     }
 
-    void compile(String input) {
-        Ast ast = ast(input);
+    public void compile(String input) {
+        List<Token> tokens = Token.tokenize(input);
+        Ast ast = new AstGen().gen(tokens);
         gen(ast);
-    }
-
-    private Ast ast(String input) {
-        if (input.charAt(0) == '"') {
-            return Ast.valueString(input.substring(1, input.length() - 1));
-        } else if (input.contains("+")) {
-            String[] ss = input.split("\\+");
-            int a = Integer.valueOf(ss[0]);
-            int b = Integer.valueOf(ss[1]);
-            return Ast.opAddInt(Ast.valueInt(a), Ast.valueInt(b));
-        } else {
-            return Ast.valueInt(Integer.valueOf(input));
-        }
     }
 
     private void gen(Ast a) {
@@ -31,7 +20,7 @@ public class Main {
                 "main:");
         genProg(a);
         int print_int = 1, print_string = 4, exit = 10;
-        if (a.t == Type.String) {
+        if (a.t == Type.Str) {
             genSyscall(print_string);
         } else if (a.t == Type.Int) {
             genSyscall(print_int);
@@ -45,7 +34,7 @@ public class Main {
     }
 
     private void genData(Ast a) {
-        if (a.kind == Kind.ValueString) {
+        if (a.kind == Kind.ValStr) {
             output(a.id + ": .asciiz\"" + a.value + "\"");
         }
         if (a.fst != null) genData(a.fst);
@@ -54,10 +43,10 @@ public class Main {
 
     private void genProg(Ast a) {
         switch (a.kind) {
-            case ValueInt:
+            case ValInt:
                 output("li $a0, " + a.value);
                 return;
-            case ValueString:
+            case ValStr:
                 output("la $a0, " + a.id);
                 break;
             case OpAddInt:
