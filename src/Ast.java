@@ -32,6 +32,22 @@ public class Ast {
     }
 
     private static int global_id = 1;
+
+    @Override
+    public String toString() {
+        switch (kind) {
+            case ValInt:
+            case ValStr:
+                return value.toString();
+            case OpAddInt:
+                return String.format("(%s + %s)", fst, snd);
+            case OpMulInt:
+                return String.format("(%s * %s)", fst, snd);
+            case UnMinusInt:
+                return String.format("-(%s)", fst);
+        }
+        throw new IllegalArgumentException("Unexpected kind: " + kind);
+    }
 }
 
 enum Type {

@@ -48,7 +48,7 @@ public class Main {
                 return;
             case ValStr:
                 output("la $a0, " + a.id);
-                break;
+                return;
             case OpAddInt:
                 genProg(a.fst);
                 // Push $a0 to stack.
@@ -63,7 +63,29 @@ public class Main {
 
                         "add $a0, $a0, $a1"
                 );
-                break;
+                return;
+            case OpMulInt:
+                genProg(a.fst);
+                // Push $a0 to stack.
+                output(
+                        "sw $a0, 0($sp)",
+                        "addi $sp, $sp, -4"
+                );
+                genProg(a.snd);
+                output(
+                        "lw $a1, 4($sp)",
+                        "addi $sp, $sp, 4",
+
+                        "mult $a0, $a1", // LO = (($s * $t) << 32) >> 32; mflo
+                        "mflo $a0"
+                );
+                return;
+            case UnMinusInt:
+                genProg(a.fst);
+                output("sub $a0, $zero, $a0");
+                return;
+            default:
+                throw new IllegalArgumentException("Unknown kind: " + a.kind);
         }
     }
 

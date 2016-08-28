@@ -16,5 +16,6 @@ public class MainTest {
         test("1+1+2");
         test("-2+1");
         test("-2147483648");
+        test("(-1+ + - +2)*3");
     }
 }

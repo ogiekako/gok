@@ -23,9 +23,9 @@ public class Token {
 
     private static Token next() {
         if (cs[p] == '(') {
-            return tok(Cls.LeftParen, p, p + 1);
+            return tok(Cls.LParen, p, p + 1);
         } else if (cs[p] == ')') {
-            return tok(Cls.RightParen, p, p + 1);
+            return tok(Cls.RParen, p, p + 1);
         } else if (cs[p] == '"') {
             int from = p++;
             while (cs[p++] != '"') ;
@@ -69,6 +69,20 @@ public class Token {
     public String toString() {
         return String.format("(%s, %s)", c, s);
     }
+
+    // Example: "(Int, 1); (Op, +); (Int, 1)"
+    public static List<Token> fromStr(String tokensStr) {
+        List<Token> res = new ArrayList<>();
+        for (String s : tokensStr.split("; ")) {
+            s = s.substring(1, s.length() - 1);
+            String cls = s.split(", ")[0];
+            Token t = new Token();
+            t.c = Cls.valueOf(cls);
+            t.s = s.substring(cls.length() + 2);
+            res.add(t);
+        }
+        return res;
+    }
 }
 
 enum Cls {
@@ -76,7 +90,7 @@ enum Cls {
     Op,
     Int,
     Str,
-    LeftParen,
-    RightParen,
+    LParen,
+    RParen,
     EOF,
 }
