@@ -37,5 +37,16 @@ test "(1+2)*3" 9
 test "(-1+ + - +2)*3" -9
 test "-1*-1" 1
 test "-2*-(1+2)" 6
+test "v:=1
+v" 1
+test "v:=2
+u:=3
+u" 3
+test "v:=2
+u:=3
+v" 2
+test "v:=2
+u:=3
+u*v" 6
 
 echo "OK"

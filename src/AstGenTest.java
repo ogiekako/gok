@@ -9,6 +9,8 @@ public class AstGenTest {
     public void testGen() throws Exception {
         testGen2("(LParen, (); (Int, 1); (Op, +); (Int, 2); (RParen, )); (Op, *); (Int, 3)",
                 Ast.opMulInt(Ast.opAddInt(Ast.valInt(1), Ast.valInt(2)), Ast.valInt(3)));
+        testGen2("(Id, v); (Assign, :=); (Int, 1); (Id, v)",
+                Ast.assignStmt("v", Ast.valInt(1), Ast.valId("v")));
     }
 
     private void testGen2(String tokensStr, Ast want) {

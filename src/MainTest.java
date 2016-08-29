@@ -17,5 +17,6 @@ public class MainTest {
         test("-2+1");
         test("-2147483648");
         test("(-1+ + - +2)*3");
+        test("v:=1\nv");
     }
 }

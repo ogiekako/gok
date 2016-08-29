@@ -40,8 +40,26 @@ public class Token {
             int from = p;
             while(isWhiteSpace(cs[++p]));
             return tok(Cls.WhiteSpace, from, p);
+        } else if (startsWith(":=")){
+            return tok(Cls.Assign,p,p+2);
+        } else if (isAlphabet(cs[p])) {
+            int from=p++;
+            while(isDigit(cs[p]) || isAlphabet(cs[p])) p++;
+            return tok(Cls.Id, from, p);
         }
         throw new IllegalArgumentException(new String(cs, p, cs.length - p));
+    }
+
+    private static boolean isAlphabet(char c) {
+        return 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z';
+    }
+
+    private static boolean startsWith(String s) {
+        for(int i=0;i<s.length();i++) {
+            if(p+i >= cs.length) return false;
+            if(cs[p+i] != s.charAt(i)) return false;
+        }
+        return true;
     }
 
     private static boolean in(char c, char... cs) {
@@ -92,5 +110,7 @@ enum Cls {
     Str,
     LParen,
     RParen,
+    Assign,
+    Id,
     EOF,
 }

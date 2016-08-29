@@ -17,7 +17,7 @@ public class AstGen {
         normalized.add(last);
         ts = normalized.toArray(new Token[0]);
         p = 0;
-        Ast res = E();
+        Ast res = S();
         if (ts[p].c != Cls.EOF) {
             throw new IllegalArgumentException(String.format("%d-th token is remaining.\nTokens:\n%s\nAst:\n%s", p, normalized, res));
         }
@@ -25,10 +25,23 @@ public class AstGen {
     }
 
     /*
+    S -> E | id := E; S
     E -> str | T + E | T
     T -> U | U * T
-    U -> + U | - U | (E) | int
+    U -> + U | - U | (E) | int | id
      */
+
+    private Ast S() {
+        if (p+1<ts.length && ts[p+1].c == Cls.Assign) {
+            if (ts[p].c != Cls.Id) {
+                throw new IllegalArgumentException("Left side of := was not id, but " + ts[p]);
+            }
+            p += 2;
+            return Ast.assignStmt(ts[p-2].s, E(), S());
+        }
+        return E();
+    }
+
     private Ast E() {
         if (ts[p].c == Cls.Str) {
             String s = ts[p++].s;
@@ -79,6 +92,8 @@ public class AstGen {
                 throw new IllegalArgumentException("AstGen: unmatched: " + ts[left]);
             p++;
             return res;
+        } else if (ts[p].c == Cls.Id) {
+            return Ast.valId(ts[p++].s);
         }
         throw new IllegalArgumentException(String.format("AstGen: %s is unexpected for I.", ts[p]));
     }

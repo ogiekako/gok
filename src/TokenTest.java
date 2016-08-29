@@ -12,6 +12,7 @@ public class TokenTest {
         testTokenize2("1  + 1*2", "(Int, 1); (WhiteSpace,   ); (Op, +); (WhiteSpace,  ); (Int, 1); (Op, *); (Int, 2)");
         testTokenize2("\"Hello, world!\n\"", "(Str, \"Hello, world!\n\")");
         testTokenize2("(1+2)*3", "(LParen, (); (Int, 1); (Op, +); (Int, 2); (RParen, )); (Op, *); (Int, 3)");
+        testTokenize2("v:=1", "(Id, v); (Assign, :=); (Int, 1)");
     }
 
     private void testTokenize2(String input, String tokensStr) {

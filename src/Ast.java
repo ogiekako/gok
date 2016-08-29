@@ -29,6 +29,13 @@ public class Ast {
     }
     public static Ast unMinusInt(Ast fst) {
         return new Ast(Type.Int, Kind.UnMinusInt, fst, null, null);
+        // irrelevant
+    }
+    public static Ast assignStmt(String id, Ast fst, Ast snd) {
+        return new Ast(fst.t, Kind.AssignStmt, fst, snd, id);
+    }
+    public static Ast valId(String s) {
+        return new Ast(Type.Unknown, Kind.ValId, null, null, s);
     }
 
     private static int global_id = 1;
@@ -38,6 +45,7 @@ public class Ast {
         switch (kind) {
             case ValInt:
             case ValStr:
+            case ValId:
                 return value.toString();
             case OpAddInt:
                 return String.format("(%s + %s)", fst, snd);
@@ -45,6 +53,8 @@ public class Ast {
                 return String.format("(%s * %s)", fst, snd);
             case UnMinusInt:
                 return String.format("-(%s)", fst);
+            case AssignStmt:
+                return String.format("%s := %s\n%s", value, fst, snd);
         }
         throw new IllegalArgumentException("Unexpected kind: " + kind);
     }
@@ -53,12 +63,15 @@ public class Ast {
 enum Type {
     Int,
     Str,
+    Unknown,
 }
 
 enum Kind {
     ValInt,
     ValStr,
+    ValId,
     OpAddInt,
     OpMulInt,
     UnMinusInt,
+    AssignStmt,
 }
