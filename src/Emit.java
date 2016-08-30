@@ -43,7 +43,6 @@ public class Emit {
             output(a.value + ":");
         }
 
-        paramOffset.clear();
         genParamOffset(a.params);
 
         output("add $fp, $zero, $sp");
@@ -55,7 +54,7 @@ public class Emit {
 
         output("add $sp, $sp, " + sp);
 
-        genProg(a.fst);
+        genBody(a.fst);
         output("add $sp, $sp, " + (-sp));
         output("lw $ra, 0($sp)");
 
@@ -91,7 +90,7 @@ public class Emit {
         if (a.snd != null) genFuncPre(a.snd);
     }
 
-    private void genProg(Ast a) {
+    private void genBody(Ast a) {
         if (a == null) return;
         switch (a.kind) {
             case ValInt:
@@ -113,48 +112,41 @@ public class Emit {
                 }
                 return;
             case OpAddInt:
-                genProg(a.fst);
-                // Push $a0 to stack.
-                output(
-                        "sw $a0, 0($sp)",
-                        "addi $sp, $sp, -4"
-                );
-                genProg(a.snd);
-                output(
-                        "lw $a1, 4($sp)",
-                        "addi $sp, $sp, 4",
-
-                        "add $a0, $a0, $a1"
-                );
-                return;
             case OpMulInt:
-                genProg(a.fst);
+                genBody(a.fst);
                 // Push $a0 to stack.
                 output(
                         "sw $a0, 0($sp)",
                         "addi $sp, $sp, -4"
                 );
-                genProg(a.snd);
+                genBody(a.snd);
                 output(
                         "lw $a1, 4($sp)",
-                        "addi $sp, $sp, 4",
-
-                        "mult $a0, $a1", // LO = (($s * $t) << 32) >> 32; mflo
-                        "mflo $a0"
+                        "addi $sp, $sp, 4"
                 );
+                if (a.kind == Kind.OpAddInt) {
+                    output(
+                            "add $a0, $a0, $a1"
+                    );
+                } else if (a.kind == Kind.OpMulInt) {
+                    output(
+                            "mult $a0, $a1", // LO = (($s * $t) << 32) >> 32; mflo
+                            "mflo $a0"
+                    );
+                }
                 return;
             case UnMinusInt:
-                genProg(a.fst);
+                genBody(a.fst);
                 output("sub $a0, $zero, $a0");
                 return;
             case AssignStmt:
-                genProg(a.fst);
+                genBody(a.fst);
                 int o = tempOffset.get(a.value.toString());
                 output("sw $a0, " + o + "($fp)");
-                genProg(a.snd);
+                genBody(a.snd);
                 return;
             case FuncCall:
-                genProg(a.fst);
+                genBody(a.fst);
                 output(
                         "sw $a0, 0($sp)",
                         "addi $sp, $sp, -4",
