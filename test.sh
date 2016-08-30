@@ -57,11 +57,30 @@ u:=3
 u*v" 6 int
 
 test "func f(i int) int {
- i+1
+ i
 }
 func main() int {
- i := 1
- i+1
-}" 2
+f(42)
+}" 42
+
+test "func g(i int) int {
+i+1
+}
+func f(i int) int {
+i+g(i*3)
+}
+func main() int {
+f(2)
+}" 9
+
+test "func g(i int) int {
+i*2
+}
+func f(i int) int {
+g(g(g(i)))
+}
+func main() int {
+f(3)
+}" 24
 
 echo "OK"

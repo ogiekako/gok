@@ -23,6 +23,6 @@ public class MainTest {
         testMain("(-1+ + - +2)*3");
         testMain("v:=1\nv");
         test("func f() {\n}\nfunc main(){}");
-        test("func f(i int) {\ni\n}\nfunc main(){}");
+        test("func f(i int) int {\ni\n}\nfunc main() int {\nf(42)\n}");
     }
 }

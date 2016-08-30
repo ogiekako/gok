@@ -30,7 +30,7 @@ public class Parser {
     Body      -> E | id := E; Body
     E -> str | T + E | T
     T -> U | U * T
-    U -> + U | - U | (E) | int | id
+    U -> + U | - U | (E) | int | id | id(E)
      */
 
     private Token checkRead(Cls expectedCls) {
@@ -139,7 +139,15 @@ public class Parser {
             checkRead(Cls.RParen);
             return res;
         } else if (ts[p].c == Cls.Id) {
-            return Ast.valId(ts[p++].s);
+            String id = ts[p++].s;
+            if (ts[p].c == Cls.LParen) {
+                p++;
+                Ast fst = E();
+                checkRead(Cls.RParen);
+                return Ast.funcCall(id, fst);
+            } else {
+                return Ast.valId(id);
+            }
         }
         throw new IllegalArgumentException(String.format("AstGen: %s is unexpected for I.", ts[p]));
     }

@@ -40,33 +40,40 @@ public class Emit {
         if (a.value.equals("main")) {
             output("main:");
         } else {
-            output(a.id + ":");
+            output(a.value + ":");
         }
 
         paramOffset.clear();
         genParamOffset(a.params);
 
-        sp = 0;
+        output("add $fp, $zero, $sp");
+
+        output("sw $ra, 0($sp)");
+        sp = -4;
         tempOffset.clear();
         genFuncPre(a.fst);
 
-        output("add $fp, $zero, $sp");
         output("add $sp, $sp, " + sp);
 
         genProg(a.fst);
         output("add $sp, $sp, " + (-sp));
+        output("lw $ra, 0($sp)");
+
+        if (!a.value.equals("main")) {
+            output("jr $ra");
+        }
 
         if (a.snd != null) {
             genFunc(a.snd);
         }
     }
 
-    // (a, b int)  a: $fp + 8,  b: $fp + 4
+    // (a, b int)  a: $fp + 12,  b: $fp + 8   (old fp: $fp + 4)
     private void genParamOffset(List<Param> params) {
-        int t = 0;
+        int t = 8;
         for(int i=params.size() - 1;i>=0; i--) {
-            t += 4;
             paramOffset.put(params.get(i).id, t);
+            t += 4;
         }
     }
 
@@ -145,6 +152,21 @@ public class Emit {
                 int o = tempOffset.get(a.value.toString());
                 output("sw $a0, " + o + "($fp)");
                 genProg(a.snd);
+                return;
+            case FuncCall:
+                genProg(a.fst);
+                output(
+                        "sw $a0, 0($sp)",
+                        "addi $sp, $sp, -4",
+
+                        "sw $fp, 0($sp)",
+                        "addi $sp, $sp, -4",
+
+                        "jal " + a.value, // $ra is set.
+
+                        "lw $fp, 4($sp)",
+                        "addi $sp, $sp, 8"
+                );
                 return;
             default:
                 throw new IllegalArgumentException("Unknown kind: " + a.kind);

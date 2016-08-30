@@ -77,6 +77,10 @@ public class Ast {
     private String str(List<Param> params) {
         return params.stream().map(p -> p.id + " " + p.t).collect(Collectors.joining(", "));
     }
+
+    public static Ast funcCall(String id, Ast fst) {
+        return new Ast(Type.Unknown, Kind.FuncCall, fst, null, id);
+    }
 }
 
 enum Type {
@@ -105,5 +109,5 @@ enum Kind {
     UnMinusInt,
     AssignStmt,
     FuncDecl,
-
+    FuncCall,
 }
