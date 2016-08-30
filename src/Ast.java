@@ -1,9 +1,13 @@
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Ast {
     Type t;
     Kind kind;
     Ast fst;
     Ast snd;
     Object value; // Excludes '"' for Str.
+    List<Param> params;
     String id;
 
     private Ast(Type t, Kind kind, Ast fst, Ast snd, Object value) {
@@ -37,6 +41,11 @@ public class Ast {
     public static Ast valId(String s) {
         return new Ast(Type.Unknown, Kind.ValId, null, null, s);
     }
+    public static Ast funcDecl(String f, List<Param> params, Type t, Ast fst, Ast snd) {
+        Ast res = new Ast(t, Kind.FuncDecl, fst, snd, f);
+        res.params = params;
+        return res;
+    }
 
     private static int global_id = 1;
 
@@ -55,15 +64,36 @@ public class Ast {
                 return String.format("-(%s)", fst);
             case AssignStmt:
                 return String.format("%s := %s\n%s", value, fst, snd);
+            case FuncDecl:
+                return String.format("func %s(%s)%s {\n%s}\n%s", value, str(params), t, str(fst), str(snd));
         }
         throw new IllegalArgumentException("Unexpected kind: " + kind);
+    }
+
+    private String str(Ast a) {
+        return a == null ? "" : a.toString();
+    }
+
+    private String str(List<Param> params) {
+        return params.stream().map(p -> p.id + " " + p.t).collect(Collectors.joining(", "));
     }
 }
 
 enum Type {
-    Int,
-    Str,
-    Unknown,
+    Int(" int"),
+    Str(" string"),
+    Void(""),
+    Unknown(" ???"),;
+    String name;
+
+    Type(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
 
 enum Kind {
@@ -74,4 +104,6 @@ enum Kind {
     OpMulInt,
     UnMinusInt,
     AssignStmt,
+    FuncDecl,
+
 }

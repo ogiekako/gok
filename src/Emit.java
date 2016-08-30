@@ -1,13 +1,12 @@
 import java.util.HashMap;
+import java.util.List;
 
 public class Emit {
-
 
     public void emit(Ast a) {
         output(".data");
         genData(a);
-        output(".text",
-                "main:");
+        output(".text");
         genFunc(a);
         int print_int = 1, print_string = 4, exit = 10;
         if (a.t == Type.Str) {
@@ -32,22 +31,53 @@ public class Emit {
     }
 
     int sp;
-    HashMap<String, Integer> offset = new HashMap<>();
+    HashMap<String, Integer> paramOffset = new HashMap<>();
+    HashMap<String, Integer> tempOffset = new HashMap<>();
     private void genFunc(Ast a) {
+        if (a.kind != Kind.FuncDecl) {
+            throw new IllegalArgumentException(String.format("Expected %s, but was %s. Ast:\n%s", Kind.FuncDecl, a.kind, a));
+        }
+        if (a.value.equals("main")) {
+            output("main:");
+        } else {
+            output(a.id + ":");
+        }
+
+        paramOffset.clear();
+        genParamOffset(a.params);
+
         sp = 0;
-        offset.clear();
-        genFuncPre(a);
+        tempOffset.clear();
+        genFuncPre(a.fst);
 
         output("add $fp, $zero, $sp");
         output("add $sp, $sp, " + sp);
-        genProg(a);
+
+        genProg(a.fst);
         output("add $sp, $sp, " + (-sp));
+
+        if (a.snd != null) {
+            genFunc(a.snd);
+        }
+    }
+
+    // (a, b int)  a: $fp + 8,  b: $fp + 4
+    private void genParamOffset(List<Param> params) {
+        int t = 0;
+        for(int i=params.size() - 1;i>=0; i--) {
+            t += 4;
+            paramOffset.put(params.get(i).id, t);
+        }
     }
 
     private void genFuncPre(Ast a) {
+        if (a == null) return;
         if (a.kind == Kind.AssignStmt) {
-            if (!offset.containsKey(a.value.toString())) {
-                offset.put(a.value.toString(), sp);
+            if (paramOffset.containsKey(a.value.toString())) {
+                throw Err.format("Redeclaration of %s.", a.value);
+            }
+            if (!tempOffset.containsKey(a.value.toString())) {
+                tempOffset.put(a.value.toString(), sp);
                 sp -= 4;
             }
         }
@@ -55,6 +85,7 @@ public class Emit {
     }
 
     private void genProg(Ast a) {
+        if (a == null) return;
         switch (a.kind) {
             case ValInt:
                 output("li $a0, " + a.value);
@@ -63,11 +94,16 @@ public class Emit {
                 output("la $a0, " + a.id);
                 return;
             case ValId:
-                if (!offset.containsKey(a.value.toString())) {
+                if (!tempOffset.containsKey(a.value.toString()) && !paramOffset.containsKey(a.value.toString())) {
                     throw new IllegalArgumentException(a.value + " is not defined.");
                 }
-                int k = this.offset.get(a.value.toString());
-                output("lw $a0, " + k + "($fp)");
+                if (tempOffset.containsKey(a.value.toString())) {
+                    int k = this.tempOffset.get(a.value.toString());
+                    output("lw $a0, " + k + "($fp)");
+                } else {
+                    int k = this.paramOffset.get(a.value.toString());
+                    output("lw $a0, " + k + "($fp)");
+                }
                 return;
             case OpAddInt:
                 genProg(a.fst);
@@ -106,7 +142,7 @@ public class Emit {
                 return;
             case AssignStmt:
                 genProg(a.fst);
-                int o = offset.get(a.value.toString());
+                int o = tempOffset.get(a.value.toString());
                 output("sw $a0, " + o + "($fp)");
                 genProg(a.snd);
                 return;

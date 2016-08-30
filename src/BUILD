@@ -8,7 +8,7 @@ java_binary(
 
 java_library(
     name="All",
-    srcs=["Debug.java", "Token.java", "AstGen.java", "Ast.java", "Emit.java"],
+    srcs=["Debug.java", "Token.java", "Parser.java", "Ast.java", "Lexer.java", "Param.java", "Emit.java", "Err.java"],
 )
 
 java_library(
@@ -18,10 +18,10 @@ java_library(
 )
 
 java_test(
-    name="TokenTest",
+    name="LexerTest",
     size="small",
     runtime_deps=["test"],
-    test_class="TokenTest",
+    test_class="LexerTest",
 )
 
 java_test(
@@ -32,8 +32,8 @@ java_test(
 )
 
 java_test(
-    name="AstGenTest",
+    name="ParserTest",
     size="small",
     runtime_deps=["test"],
-    test_class="AstGenTest",
+    test_class="ParserTest",
 )

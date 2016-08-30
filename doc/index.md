@@ -7,14 +7,24 @@ Go Kompaira.
 - [Compiler video lecture](https://www.youtube.com/playlist?list=PLFB9EC7B8FE963EB8)
 - [MIPS instruction](http://logos.cs.uic.edu/366/notes/mips%20quick%20tutorial.htm)
 - [MIPS assebmly language](https://en.wikipedia.org/wiki/MIPS_instruction_set#MIPS_assembly_language)
-  - [Register](https://en.wikipedia.org/wiki/MIPS_instruction_set#Compiler_register_usage)
-  - Instructions
-    - [Integer](https://en.wikipedia.org/wiki/MIPS_instruction_set#Integer)
-    - [Floating point](https://en.wikipedia.org/wiki/MIPS_instruction_set#Floating_point)
-    - [Pseudo instructions](https://en.wikipedia.org/wiki/MIPS_instruction_set#Pseudo_instructions)
-    - [Other instructions](https://en.wikipedia.org/wiki/MIPS_instruction_set#Other_instructions)
+    - [Register](https://en.wikipedia.org/wiki/MIPS_instruction_set#Compiler_register_usage)
+    - Instructions
+        - [Integer](https://en.wikipedia.org/wiki/MIPS_instruction_set#Integer)
+        - [Floating point](https://en.wikipedia.org/wiki/MIPS_instruction_set#Floating_point)
+        - [Pseudo instructions](https://en.wikipedia.org/wiki/MIPS_instruction_set#Pseudo_instructions)
+        - [Other instructions](https://en.wikipedia.org/wiki/MIPS_instruction_set#Other_instructions)
+- Go language
+    - [Language Specification](https://golang.org/ref/spec)
 
 ## 日記
+
+### 2016-08-30
+
+Lecture 8 までみて、SLR(1) 文法を理解した。
+与えられた文字列を左から見ていって、Shift/Reduce を決める。[8-5](https://www.youtube.com/watch?v=t4p3au3dsz0&list=PLFB9EC7B8FE963EB8&index=38)
+ から 8-7 が Examples で、これだけみればわかるかもしれない。
+
+関数定義を入れた。呼び出しはまだ。
 
 ### 2016-08-29
 handle という概念がなかなか難しい。

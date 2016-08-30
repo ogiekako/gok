@@ -17,36 +17,51 @@ function test() {
   diff /tmp/actual /tmp/expected || (echo "Failed: Unexpected output." && exit 1)
 }
 
+function test_main() {
+  input="func main() $3 {
+$1
+}"
+  test "$input" "$2"
+}
+
 bazel build src/Main
 
-test '"A"' "A"
-test '"Hello, World!\n"' "Hello, World!
-"
-test 1 1
-test 2147483647 2147483647
-test -2147483648 -2147483648
+test_main '"A"' "A" string
+test_main '"Hello, World!\n"' "Hello, World!
+" string
+test_main 1 1 int
+test_main 2147483647 2147483647 int
+test_main -2147483648 -2147483648 int
 
-test "1+1" 2
-test "1+1+2" 4
-test "1+3  + 2" 6
+test_main "1+1" 2 int
+test_main "1+1+2" 4 int
+test_main "1+3  + 2" 6 int
 
-test "2*3" 6
-test "1+2*3" 7
-test "2*3+4" 10
-test "(1+2)*3" 9
-test "(-1+ + - +2)*3" -9
-test "-1*-1" 1
-test "-2*-(1+2)" 6
-test "v:=1
-v" 1
-test "v:=2
+test_main "2*3" 6 int
+test_main "1+2*3" 7 int
+test_main "2*3+4" 10 int
+test_main "(1+2)*3" 9 int
+test_main "(-1+ + - +2)*3" -9 int
+test_main "-1*-1" 1 int
+test_main "-2*-(1+2)" 6 int
+test_main "v:=1
+v" 1 int
+test_main "v:=2
 u:=3
-u" 3
-test "v:=2
+u" 3 int
+test_main "v:=2
 u:=3
-v" 2
-test "v:=2
+v" 2 int
+test_main "v:=2
 u:=3
-u*v" 6
+u*v" 6 int
+
+test "func f(i int) int {
+ i+1
+}
+func main() int {
+ i := 1
+ i+1
+}" 2
 
 echo "OK"

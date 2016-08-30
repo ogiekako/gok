@@ -4,7 +4,7 @@ import org.junit.Test;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TokenTest {
+public class LexerTest {
 
     @Test
     public void testTokenize() throws Exception {
@@ -13,12 +13,16 @@ public class TokenTest {
         testTokenize2("\"Hello, world!\n\"", "(Str, \"Hello, world!\n\")");
         testTokenize2("(1+2)*3", "(LParen, (); (Int, 1); (Op, +); (Int, 2); (RParen, )); (Op, *); (Int, 3)");
         testTokenize2("v:=1", "(Id, v); (Assign, :=); (Int, 1)");
+        testTokenize2("func f(v int) {}",
+                "(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (Id, v); (WhiteSpace,  ); (Keyword, int); (RParen, )); (WhiteSpace,  ); (LBrace, {); (RBrace, })");
+        testTokenize2("func f() string {}",
+                "(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (RParen, )); (WhiteSpace,  ); (Keyword, string); (WhiteSpace,  ); (LBrace, {); (RBrace, })");
     }
 
     private void testTokenize2(String input, String tokensStr) {
         List<Token> want = Token.fromStr(tokensStr);
 
-        List<Token> actual = Token.tokenize(input);
+        List<Token> actual = new Lexer().tokenize(input);
         String err = String.format("Want:\n%s\nGot:\n%s", tokensStr, str(actual));
         Assert.assertEquals("Different size.  " + err,
                 want.size(), actual.size());

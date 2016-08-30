@@ -1,11 +1,11 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class AstGen {
+public class Parser {
 
     Token[] ts;
     int p;
-    public Ast gen(List<Token> tokens) {
+    public Ast parse(List<Token> tokens) {
         List<Token> normalized = new ArrayList<>();
         for(Token t : tokens) {
             if (t.c == Cls.WhiteSpace) continue;
@@ -17,7 +17,7 @@ public class AstGen {
         normalized.add(last);
         ts = normalized.toArray(new Token[0]);
         p = 0;
-        Ast res = S();
+        Ast res = Prog();
         if (ts[p].c != Cls.EOF) {
             throw new IllegalArgumentException(String.format("%d-th token is remaining.\nTokens:\n%s\nAst:\n%s", p, normalized, res));
         }
@@ -25,19 +25,68 @@ public class AstGen {
     }
 
     /*
-    S -> E | id := E; S
+    Prog      -> Body | func id Signature { Body? }; Prog
+    Signature -> ( id "int" ) "int"
+    Body      -> E | id := E; Body
     E -> str | T + E | T
     T -> U | U * T
     U -> + U | - U | (E) | int | id
      */
 
-    private Ast S() {
+    private Token checkRead(Cls expectedCls) {
+        if (ts[p].c == expectedCls) {
+            return ts[p++];
+        }
+        throw new IllegalArgumentException(String.format(
+                "Expected %d-th token to be %s, but was %s.", p, expectedCls, ts[p]));
+    }
+
+    private Token checkRead(Cls expectedCls, String s) {
+        if (ts[p].c == expectedCls && ts[p].s.equals(s)) {
+            return ts[p++];
+        }
+        throw new IllegalArgumentException(String.format(
+                "Expected %d-th token to be (%s, %s), but was %s.", p, expectedCls, s, ts[p]));
+    }
+
+    private Ast Prog() {
+        if (ts[p].c == Cls.EOF) return null;
+        if (ts[p].c == Cls.Keyword && ts[p].s.equals("func")) {
+            p++;
+            String funcName = checkRead(Cls.Id).s;
+            checkRead(Cls.LParen);
+            List<Param> params = new ArrayList<>();
+            while (ts[p].c != Cls.RParen) {
+                String param = checkRead(Cls.Id).s;
+                Token tk = checkRead(Cls.Keyword);
+                Err.checkIn(tk.s, "int", "string");
+                params.add(new Param(param, tk.s.equals("int") ? Type.Int : Type.Str));
+            }
+            checkRead(Cls.RParen);
+            Type t = Type.Void;
+            if (ts[p].c == Cls.Keyword) {
+                Token tk = checkRead(Cls.Keyword);
+                Err.checkIn(tk.s, "int", "string");
+                t = tk.s.equals("int") ? Type.Int : Type.Str;
+            }
+            checkRead(Cls.LBrace);
+            Ast fst = Body();
+            checkRead(Cls.RBrace);
+            Ast snd = Prog();
+            return Ast.funcDecl(funcName, params, t, fst, snd);
+        } else {
+            return Body();
+        }
+    }
+
+    private Ast Body() {
+        if (ts[p].c == Cls.RBrace) return null;
         if (p+1<ts.length && ts[p+1].c == Cls.Assign) {
             if (ts[p].c != Cls.Id) {
                 throw new IllegalArgumentException("Left side of := was not id, but " + ts[p]);
             }
             p += 2;
-            return Ast.assignStmt(ts[p-2].s, E(), S());
+            return Ast.assignStmt(ts[p-2].s, E(), Body());
         }
         return E();
     }
@@ -85,12 +134,9 @@ public class AstGen {
         } else if (ts[p].c == Cls.Int) {
             return Ast.valInt(Integer.valueOf(ts[p++].s));
         } else if (ts[p].c == Cls.LParen) {
-            int left = p;
             p++;
             Ast res = E();
-            if (ts[p].c != Cls.RParen)
-                throw new IllegalArgumentException("AstGen: unmatched: " + ts[left]);
-            p++;
+            checkRead(Cls.RParen);
             return res;
         } else if (ts[p].c == Cls.Id) {
             return Ast.valId(ts[p++].s);
