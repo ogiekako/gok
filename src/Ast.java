@@ -25,6 +25,9 @@ public class Ast {
     public static Ast opMulInt(Ast fst, Ast snd) {
         return new Ast(Type.Int, Kind.OpMulInt, fst, snd, null);
     }
+    public static Ast valBool(boolean b) {
+        return new Ast(Type.Bool, Kind.ValBool, null, null, b);
+    }
     public static Ast valInt(int n) {
         return new Ast(Type.Int, Kind.ValInt, null, null, n);
     }
@@ -52,6 +55,7 @@ public class Ast {
     @Override
     public String toString() {
         switch (kind) {
+            case ValBool:
             case ValInt:
             case ValStr:
             case ValId:
@@ -81,9 +85,11 @@ public class Ast {
     public static Ast funcCall(String id, Ast fst) {
         return new Ast(Type.Unknown, Kind.FuncCall, fst, null, id);
     }
+
 }
 
 enum Type {
+    Bool(" bool"),
     Int(" int"),
     Str(" string"),
     Void(""),
@@ -98,9 +104,19 @@ enum Type {
     public String toString() {
         return name;
     }
+
+    static Type of(String s) {
+        switch (s) {
+            case "bool": return Bool;
+            case "int": return Int;
+            case "string": return Str;
+            default: throw Err.format("Unknown type name %s", s);
+        }
+    }
 }
 
 enum Kind {
+    ValBool,
     ValInt,
     ValStr,
     ValId,

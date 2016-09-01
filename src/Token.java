@@ -28,6 +28,7 @@ public class Token {
 enum Cls {
     WhiteSpace,
     Op,
+    Bool,
     Int,
     Str,
     LParen,

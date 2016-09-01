@@ -8,6 +8,8 @@ public class LexerTest {
 
     @Test
     public void testTokenize() throws Exception {
+        testTokenize2("true", "(Bool, true)");
+        testTokenize2("false", "(Bool, false)");
         testTokenize2("1+1", "(Int, 1); (Op, +); (Int, 1)");
         testTokenize2("1  + 1*2", "(Int, 1); (WhiteSpace,   ); (Op, +); (WhiteSpace,  ); (Int, 1); (Op, *); (Int, 2)");
         testTokenize2("\"Hello, world!\n\"", "(Str, \"Hello, world!\n\")");
@@ -17,6 +19,8 @@ public class LexerTest {
                 "(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (Id, v); (WhiteSpace,  ); (Keyword, int); (RParen, )); (WhiteSpace,  ); (LBrace, {); (RBrace, })");
         testTokenize2("func f() string {}",
                 "(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (RParen, )); (WhiteSpace,  ); (Keyword, string); (WhiteSpace,  ); (LBrace, {); (RBrace, })");
+        testTokenize2("func f() bool {}",
+                "(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (RParen, )); (WhiteSpace,  ); (Keyword, bool); (WhiteSpace,  ); (LBrace, {); (RBrace, })");
     }
 
     private void testTokenize2(String input, String tokensStr) {

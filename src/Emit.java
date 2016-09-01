@@ -5,14 +5,34 @@ public class Emit {
 
     public void emit(Ast a) {
         output(".data");
+        output("true: .asciiz \"true\"");
+        output("false: .asciiz \"false\"");
         genData(a);
         output(".text");
         genFunc(a);
         int print_int = 1, print_string = 4, exit = 10;
-        if (a.t == Type.Str) {
-            genSyscall(print_string);
-        } else if (a.t == Type.Int) {
-            genSyscall(print_int);
+        switch (a.t) {
+            case Void:
+                break;
+            case Bool:
+                output(
+                        "bgt $a0 $zero set_true",
+                        "la $a0 false",
+                        "b set_done",
+                        "set_true:",
+                        "la $a0 true",
+                        "set_done:"
+                );
+                genSyscall(print_string);
+                break;
+            case Int:
+                genSyscall(print_int);
+                break;
+            case Str:
+                genSyscall(print_string);
+                break;
+            default:
+                throw  Err.format("Unknown type: %s", a.t);
         }
         genSyscall(exit);
     }
@@ -93,6 +113,9 @@ public class Emit {
     private void genBody(Ast a) {
         if (a == null) return;
         switch (a.kind) {
+            case ValBool:
+                output("li $a0, " + ((Boolean)(a.value) ? 1 : 0));
+                return;
             case ValInt:
                 output("li $a0, " + a.value);
                 return;

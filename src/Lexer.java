@@ -7,6 +7,7 @@ import java.util.Set;
 public class Lexer {
     static Set<String> keywords = new HashSet<>(Arrays.asList(
             "func",
+            "bool",
             "int",
             "string"
     ));
@@ -57,6 +58,9 @@ public class Lexer {
             String s = new String(cs, from, p - from);
             if (keywords.contains(s)) {
                 return tok(Cls.Keyword, from, p);
+            }
+            if (s.equals("true") || s.equals("false")) {
+                return tok(Cls.Bool, from, p);
             }
             return tok(Cls.Id, from, p);
         }

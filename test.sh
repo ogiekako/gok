@@ -26,6 +26,8 @@ $1
 
 bazel build src/Main
 
+test_main "true" "true" bool
+test_main "false" "false" bool
 test_main '"A"' "A" string
 test_main '"Hello, World!\n"' "Hello, World!
 " string
@@ -82,5 +84,12 @@ g(g(g(i)))
 func main() int {
 f(3)
 }" 24
+
+test "func f(i bool) bool {
+true
+}
+func main() bool {
+f(false)
+}" true
 
 echo "OK"

@@ -13,6 +13,8 @@ public class MainTest {
 
     @Test
     public void testCompile() {
+        testMain("true");
+        testMain("false");
         testMain("\"A\"");
         testMain("\"Hello, World!\\n\"");
         testMain("1+1");
@@ -24,5 +26,6 @@ public class MainTest {
         testMain("v:=1\nv");
         test("func f() {\n}\nfunc main(){}");
         test("func f(i int) int {\ni\n}\nfunc main() int {\nf(42)\n}");
+        test("func f(i bool) bool {\ni\n}\nfunc main() bool {\nf(true)\n}");
     }
 }

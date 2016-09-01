@@ -30,7 +30,7 @@ public class Parser {
     Body      -> E | id := E; Body
     E -> str | T + E | T
     T -> U | U * T
-    U -> + U | - U | (E) | int | id | id(E)
+    U -> + U | - U | (E) | int | bool | id | id(E)
      */
 
     private Token checkRead(Cls expectedCls) {
@@ -39,14 +39,6 @@ public class Parser {
         }
         throw new IllegalArgumentException(String.format(
                 "Expected %d-th token to be %s, but was %s.", p, expectedCls, ts[p]));
-    }
-
-    private Token checkRead(Cls expectedCls, String s) {
-        if (ts[p].c == expectedCls && ts[p].s.equals(s)) {
-            return ts[p++];
-        }
-        throw new IllegalArgumentException(String.format(
-                "Expected %d-th token to be (%s, %s), but was %s.", p, expectedCls, s, ts[p]));
     }
 
     private Ast Prog() {
@@ -59,15 +51,13 @@ public class Parser {
             while (ts[p].c != Cls.RParen) {
                 String param = checkRead(Cls.Id).s;
                 Token tk = checkRead(Cls.Keyword);
-                Err.checkIn(tk.s, "int", "string");
-                params.add(new Param(param, tk.s.equals("int") ? Type.Int : Type.Str));
+                params.add(new Param(param, Type.of(tk.s)));
             }
             checkRead(Cls.RParen);
             Type t = Type.Void;
             if (ts[p].c == Cls.Keyword) {
                 Token tk = checkRead(Cls.Keyword);
-                Err.checkIn(tk.s, "int", "string");
-                t = tk.s.equals("int") ? Type.Int : Type.Str;
+                t = Type.of(tk.s);
             }
             checkRead(Cls.LBrace);
             Ast fst = Body();
@@ -131,6 +121,8 @@ public class Parser {
                     return Ast.unMinusInt(U());
                 }
             }
+        } else if (ts[p].c == Cls.Bool) {
+            return Ast.valBool(Boolean.valueOf(ts[p++].s));
         } else if (ts[p].c == Cls.Int) {
             return Ast.valInt(Integer.valueOf(ts[p++].s));
         } else if (ts[p].c == Cls.LParen) {
@@ -149,6 +141,18 @@ public class Parser {
                 return Ast.valId(id);
             }
         }
-        throw new IllegalArgumentException(String.format("AstGen: %s is unexpected for I.", ts[p]));
+        throw new IllegalArgumentException(String.format("AstGen: %s is unexpected for I\n%s.", ts[p], genStatus()));
+    }
+
+    private String genStatus() {
+        StringBuilder b = new StringBuilder();
+        for(int i=0;i<p;i++){
+            b.append(ts[i].s + " ");
+        }
+        b.append(">>>" + ts[p].s + "<<<");
+        for(int i=p+1;i<ts.length;i++){
+            b.append(" " + ts[i].s);
+        }
+        return b.toString();
     }
 }
