@@ -35,6 +35,8 @@ test_main 1 1 int
 test_main 2147483647 2147483647 int
 test_main -2147483648 -2147483648 int
 
+test_main "1<1" false bool
+test_main "1<2" true bool
 test_main "1+1" 2 int
 test_main "1+1+2" 4 int
 test_main "1+3  + 2" 6 int
@@ -91,5 +93,12 @@ true
 func main() bool {
 f(false)
 }" true
+
+test "func f(i int) bool {
+i < 42
+}
+func main() bool {
+f(42)
+}" false
 
 echo "OK"

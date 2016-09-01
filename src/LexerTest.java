@@ -10,6 +10,7 @@ public class LexerTest {
     public void testTokenize() throws Exception {
         testTokenize2("true", "(Bool, true)");
         testTokenize2("false", "(Bool, false)");
+        testTokenize2("1<1", "(Int, 1); (Op, <); (Int, 1)");
         testTokenize2("1+1", "(Int, 1); (Op, +); (Int, 1)");
         testTokenize2("1  + 1*2", "(Int, 1); (WhiteSpace,   ); (Op, +); (WhiteSpace,  ); (Int, 1); (Op, *); (Int, 2)");
         testTokenize2("\"Hello, world!\n\"", "(Str, \"Hello, world!\n\")");
@@ -26,7 +27,7 @@ public class LexerTest {
     private void testTokenize2(String input, String tokensStr) {
         List<Token> want = Token.fromStr(tokensStr);
 
-        List<Token> actual = new Lexer().tokenize(input);
+        List<Token> actual = new Lexer().lex(input);
         String err = String.format("Want:\n%s\nGot:\n%s", tokensStr, str(actual));
         Assert.assertEquals("Different size.  " + err,
                 want.size(), actual.size());

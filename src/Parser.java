@@ -28,8 +28,9 @@ public class Parser {
     Prog      -> Body | func id Signature { Body? }; Prog
     Signature -> ( id "int" ) "int"
     Body      -> E | id := E; Body
-    E -> str | T + E | T
-    T -> U | U * T
+    E -> str | Plus < E | Plus
+    Plus -> Mul | Mul + Plus
+    Mul -> U | U * Mul
     U -> + U | - U | (E) | int | bool | id | id(E)
      */
 
@@ -86,22 +87,33 @@ public class Parser {
             String s = ts[p++].s;
             return Ast.valStr(s.substring(1, s.length() - 1));
         }
-        Ast fst = T();
+        Ast fst = Plus();
         if (ts[p].c == Cls.Op){
-            if (ts[p].s.equals("+")) {
+            if (ts[p].s.equals("<")) {
                 p++;
-                return Ast.opAddInt(fst, E());
+                return Ast.opLT(fst, E());
             }
         }
         return fst;
     }
 
-    private Ast T() {
+    private Ast Plus() {
+        Ast fst = Mul();
+        if (ts[p].c == Cls.Op){
+            if (ts[p].s.equals("+")) {
+                p++;
+                return Ast.opAddInt(fst, Plus());
+            }
+        }
+        return fst;
+    }
+
+    private Ast Mul() {
         Ast fst = U();
         if (ts[p].c == Cls.Op) {
             if (ts[p].s.equals("*")) {
                 p++;
-                return Ast.opMulInt(fst, T());
+                return Ast.opMulInt(fst, Mul());
             }
         }
         return fst;

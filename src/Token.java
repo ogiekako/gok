@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Token {
     Cls c;
@@ -22,6 +23,10 @@ public class Token {
             res.add(t);
         }
         return res;
+    }
+
+    public static String str(List<Token> tokens) {
+        return tokens.stream().map(tk -> "(" + tk.c + ", " + tk.s + ")").collect(Collectors.joining("; "));
     }
 }
 

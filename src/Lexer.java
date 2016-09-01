@@ -15,7 +15,7 @@ public class Lexer {
     int p;
     List<Token> res;
 
-    public List<Token> tokenize(String input) {
+    public List<Token> lex(String input) {
         cs = new char[input.length() + 1];
         for (int i = 0; i < input.length(); i++) cs[i] = input.charAt(i);
         cs[input.length()] = '$';
@@ -36,11 +36,11 @@ public class Lexer {
             return tok(Cls.LBrace, p, p + 1);
         } else if (cs[p] == '}') {
             return tok(Cls.RBrace, p, p + 1);
-        } if (cs[p] == '"') {
+        } else if (cs[p] == '"') {
             int from = p++;
             while (cs[p++] != '"') ;
             return tok(Cls.Str, from, p);
-        } else if (in(cs[p], '+', '-', '*')) {
+        } else if (in(cs[p], '+', '-', '*', '<')) {
             return tok(Cls.Op, p, p + 1);
         } else if (isDigit(cs[p])) {
             int from = p;

@@ -6,21 +6,33 @@ import java.util.List;
 public class ParserTest {
 
     @Test
-    public void testParse() throws Exception {
-        testParse2("(Bool, true)", "true");
-        testParse2("(LParen, (); (Int, 1); (Op, +); (Int, 2); (RParen, )); (Op, *); (Int, 3)",
-                Ast.opMulInt(Ast.opAddInt(Ast.valInt(1), Ast.valInt(2)), Ast.valInt(3)).toString());
-        testParse2("(Id, v); (Assign, :=); (Int, 1); (Id, v)",
+    public void parse() throws Exception {
+        testParse("(Bool, true)", "true");
+        testParse("(Int, 1); (Op, <); (Int, 1)", "(1 < 1)");
+        testParse("(LParen, (); (Int, 1); (Op, +); (Int, 2); (RParen, )); (Op, *); (Int, 3)",
+                "((1 + 2) * 3)");
+        testParse("(Id, v); (Assign, :=); (Int, 1); (Id, v)",
                 Ast.assignStmt("v", Ast.valInt(1), Ast.valId("v")).toString());
-        testParse2("(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (RParen, )); (WhiteSpace,  ); (Keyword, int); (LBrace, {); (RBrace, })",
+        testParse("(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (RParen, )); (WhiteSpace,  ); (Keyword, int); (LBrace, {); (RBrace, })",
                 "func f() int {\n}\n");
-        testParse2("(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (RParen, )); (WhiteSpace,  ); (Keyword, bool); (LBrace, {); (RBrace, })",
+        testParse("(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (RParen, )); (WhiteSpace,  ); (Keyword, bool); (LBrace, {); (RBrace, })",
                 "func f() bool {\n}\n");
-        testParse2("(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (RParen, )); (WhiteSpace,  ); (LBrace, {); (RBrace, })",
+        testParse("(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (RParen, )); (WhiteSpace,  ); (LBrace, {); (RBrace, })",
                 "func f() {\n}\n");
     }
 
-    private void testParse2(String tokensStr, String wantAstStr) {
+    @Test
+    public void lexParse() throws Exception {
+        textLexParse("true", "true");
+        textLexParse("1 + 2 * 3 < 3 * 2 + 1", "((1 + (2 * 3)) < ((3 * 2) + 1))");
+    }
+
+    private void textLexParse(String input, String wantAstStr) {
+        List<Token> tokens = new Lexer().lex(input);
+        testParse(Token.str(tokens), wantAstStr);
+    }
+
+    private void testParse(String tokensStr, String wantAstStr) {
         List<Token> tokens = Token.fromStr(tokensStr);
         Ast actual = new Parser().parse(tokens);
         String actualStr = actual.toString();

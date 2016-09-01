@@ -134,6 +134,7 @@ public class Emit {
                     output("lw $a0, " + k + "($fp)");
                 }
                 return;
+            case OpLTInt:
             case OpAddInt:
             case OpMulInt:
                 genBody(a.fst);
@@ -147,15 +148,25 @@ public class Emit {
                         "lw $a1, 4($sp)",
                         "addi $sp, $sp, 4"
                 );
-                if (a.kind == Kind.OpAddInt) {
-                    output(
-                            "add $a0, $a0, $a1"
-                    );
-                } else if (a.kind == Kind.OpMulInt) {
-                    output(
-                            "mult $a0, $a1", // LO = (($s * $t) << 32) >> 32; mflo
-                            "mflo $a0"
-                    );
+                switch (a.kind) {
+                    case OpAddInt:
+                        output(
+                                "add $a0, $a0, $a1"
+                        );
+                        break;
+                    case OpMulInt:
+                        output(
+                                "mult $a0, $a1", // LO = (($s * $t) << 32) >> 32; mflo
+                                "mflo $a0"
+                        );
+                        break;
+                    case OpLTInt:  // $a1 < $a0
+                        output(
+                                "slt $a0, $a1, $a0"
+                        );
+                        break;
+                    default:
+                        throw Err.format("Unknown kind " + a.kind);
                 }
                 return;
             case UnMinusInt:

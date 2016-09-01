@@ -19,6 +19,7 @@ public class Ast {
         this.id = kind.toString() + "_" + (global_id++);
     }
 
+    public static Ast opLT(Ast fst, Ast snd) {return new Ast(Type.Bool, Kind.OpLTInt, fst, snd, null);}
     public static Ast opAddInt(Ast fst, Ast snd) {
         return new Ast(Type.Int, Kind.OpAddInt, fst, snd, null);
     }
@@ -60,6 +61,8 @@ public class Ast {
             case ValStr:
             case ValId:
                 return value.toString();
+            case OpLTInt:
+                return String.format("(%s < %s)", fst, snd);
             case OpAddInt:
                 return String.format("(%s + %s)", fst, snd);
             case OpMulInt:
@@ -120,6 +123,7 @@ enum Kind {
     ValInt,
     ValStr,
     ValId,
+    OpLTInt,
     OpAddInt,
     OpMulInt,
     UnMinusInt,

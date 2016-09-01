@@ -17,6 +17,7 @@ public class MainTest {
         testMain("false");
         testMain("\"A\"");
         testMain("\"Hello, World!\\n\"");
+        testMain("1<1");
         testMain("1+1");
         testMain("1");
         testMain("1+1+2");
