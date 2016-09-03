@@ -25,6 +25,7 @@ public class ParserTest {
     public void lexParse() throws Exception {
         textLexParse("true", "true");
         textLexParse("1 + 2 * 3 < 3 * 2 + 1", "((1 + (2 * 3)) < ((3 * 2) + 1))");
+        textLexParse("if 1 < 1 {\n1\n}\n2", "if (1 < 1) {\n1\n}\n2");
     }
 
     private void textLexParse(String input, String wantAstStr) {

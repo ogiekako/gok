@@ -179,6 +179,14 @@ public class Emit {
                 output("sw $a0, " + o + "($fp)");
                 genBody(a.snd);
                 return;
+            case IfStmt:
+                genBody(a.cond);
+                String elseId = a.id + "_else";
+                output("beq $a0, $zero, " + elseId);
+                genBody(a.fst);
+                output(elseId + ":");
+                genBody(a.snd);
+                return;
             case FuncCall:
                 genBody(a.fst);
                 output(

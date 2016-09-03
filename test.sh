@@ -59,6 +59,11 @@ v" 2 int
 test_main "v:=2
 u:=3
 u*v" 6 int
+test_main "v:=0
+if 1 < 2 {
+ v:=v+1
+}
+v" 1 int
 
 test "func f(i int) int {
  i
@@ -100,5 +105,17 @@ i < 42
 func main() bool {
 f(42)
 }" false
+
+test "
+func f(n int) int {
+  res := n
+  if n < 10 {
+    res := res * f(n + 1)
+  }
+  res
+}
+func main() int {
+  f(1)
+}" 3628800
 
 echo "OK"

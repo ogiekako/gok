@@ -7,6 +7,7 @@ import java.util.Set;
 public class Lexer {
     static Set<String> keywords = new HashSet<>(Arrays.asList(
             "func",
+            "if",
             "bool",
             "int",
             "string"

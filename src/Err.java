@@ -11,4 +11,10 @@ public class Err {
     public static IllegalArgumentException format(String tmpl, Object... os) {
         return new IllegalArgumentException(String.format(tmpl, os));
     }
+
+    public static void checkEq(Object o1, Object o2, String errTmpl, Object... os) {
+        if (!o1.equals(o2)) {
+            throw format(errTmpl, os);
+        }
+    }
 }

@@ -7,7 +7,8 @@ public class Ast {
     Ast fst;
     Ast snd;
     Object value; // Excludes '"' for Str.
-    List<Param> params;
+    List<Param> params; // for funcDecl.
+    Ast cond; // for ifStmt.
     String id;
 
     private Ast(Type t, Kind kind, Ast fst, Ast snd, Object value) {
@@ -42,6 +43,11 @@ public class Ast {
     public static Ast assignStmt(String id, Ast fst, Ast snd) {
         return new Ast(fst.t, Kind.AssignStmt, fst, snd, id);
     }
+    public static Ast ifStmt(Ast cond, Ast fst, Ast snd) {
+        Ast res = new Ast(fst.t, Kind.IfStmt, fst, snd, null);
+        res.cond = cond;
+        return res;
+    }
     public static Ast valId(String s) {
         return new Ast(Type.Unknown, Kind.ValId, null, null, s);
     }
@@ -71,6 +77,8 @@ public class Ast {
                 return String.format("-(%s)", fst);
             case AssignStmt:
                 return String.format("%s := %s\n%s", value, fst, snd);
+            case IfStmt:
+                return String.format("if %s {\n%s\n}\n%s", cond, fst, snd);
             case FuncDecl:
                 return String.format("func %s(%s)%s {\n%s}\n%s", value, str(params), t, str(fst), str(snd));
         }
@@ -128,6 +136,7 @@ enum Kind {
     OpMulInt,
     UnMinusInt,
     AssignStmt,
+    IfStmt,
     FuncDecl,
     FuncCall,
 }

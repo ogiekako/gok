@@ -27,7 +27,7 @@ public class Parser {
     /*
     Prog      -> Body | func id Signature { Body? }; Prog
     Signature -> ( id "int" ) "int"
-    Body      -> E | id := E; Body
+    Body      -> E | id := E; Body | if E { Body } Body
     E -> str | Plus < E | Plus
     Plus -> Mul | Mul + Plus
     Mul -> U | U * Mul
@@ -78,6 +78,13 @@ public class Parser {
             }
             p += 2;
             return Ast.assignStmt(ts[p-2].s, E(), Body());
+        } else if (ts[p].c == Cls.Keyword && ts[p].s.equals("if")) {
+            p++;
+            Ast cond = E();
+            checkRead(Cls.LBrace);
+            Ast fst = Body();
+            checkRead(Cls.RBrace);
+            return Ast.ifStmt(cond, fst, Body());
         }
         return E();
     }
