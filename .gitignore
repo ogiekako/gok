@@ -4,5 +4,6 @@ bazel-genfiles
 bazel-gok
 bazel-out
 bazel-testlogs
+lib
 out/production
 gok.iml

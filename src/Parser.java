@@ -5,7 +5,7 @@ public class Parser {
 
     Token[] ts;
     int p;
-    public Ast parse(List<Token> tokens) {
+    public Ast.Pkg parse(List<Token> tokens) {
         List<Token> normalized = new ArrayList<>();
         for(Token t : tokens) {
             if (t.c == Cls.WhiteSpace) continue;
@@ -17,22 +17,12 @@ public class Parser {
         normalized.add(last);
         ts = normalized.toArray(new Token[0]);
         p = 0;
-        Ast res = Prog();
+        Ast.Pkg res = Pkg();
         if (ts[p].c != Cls.EOF) {
             throw new IllegalArgumentException(String.format("%d-th token is remaining.\nTokens:\n%s\nAst:\n%s", p, normalized, res));
         }
         return res;
     }
-
-    /*
-    Prog      -> Body | func id Signature { Body? }; Prog
-    Signature -> ( id "int" ) "int"
-    Body      -> E | id := E; Body | if E { Body } Body
-    E -> str | Plus < E | Plus
-    Plus -> Mul | Mul + Plus
-    Mul -> U | U * Mul
-    U -> + U | - U | (E) | int | bool | id | id(E)
-     */
 
     private Token checkRead(Cls expectedCls) {
         if (ts[p].c == expectedCls) {
@@ -40,6 +30,30 @@ public class Parser {
         }
         throw new IllegalArgumentException(String.format(
                 "Expected %d-th token to be %s, but was %s.", p, expectedCls, ts[p]));
+    }
+
+    private Token checkRead(Cls expectedCls, String s) {
+        if (ts[p].c == expectedCls && ts[p].s.equals(s)) {
+            return ts[p++];
+        }
+        throw new IllegalArgumentException(String.format(
+                "Expected %d-th token to be (%s, %s), but was %s.", p, expectedCls, s, ts[p]));
+    }
+
+    /*
+    Pkg       -> package id; Prog
+    Prog      -> Body | func id Signature { Body? }; Prog
+    Signature -> ( id "int" ) "int"
+    Body      -> E | id := E; Body | if E { Body } Body | return E
+    E -> str | Plus < E | Plus
+    Plus -> Mul | Mul + Plus
+    Mul -> U | U * Mul
+    U -> + U | - U | (E) | int | bool | id | id(E)
+     */
+    Ast.Pkg Pkg() {
+        checkRead(Cls.Keyword, "package");
+        String packageName = checkRead(Cls.Id).s;
+        return new Ast.Pkg(packageName, Prog());
     }
 
     private Ast Prog() {
@@ -85,6 +99,9 @@ public class Parser {
             Ast fst = Body();
             checkRead(Cls.RBrace);
             return Ast.ifStmt(cond, fst, Body());
+        } else if (ts[p].c == Cls.Keyword && ts[p].s.equals("return")) {
+            p++;
+            return Ast.retStmt(E());
         }
         return E();
     }

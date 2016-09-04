@@ -48,6 +48,9 @@ public class Ast {
         res.cond = cond;
         return res;
     }
+    public static Ast retStmt(Ast fst) {
+        return new Ast(fst.t, Kind.RetStmt, fst, null, null);
+    }
     public static Ast valId(String s) {
         return new Ast(Type.Unknown, Kind.ValId, null, null, s);
     }
@@ -79,6 +82,8 @@ public class Ast {
                 return String.format("%s := %s\n%s", value, fst, snd);
             case IfStmt:
                 return String.format("if %s {\n%s\n}\n%s", cond, fst, snd);
+            case RetStmt:
+                return String.format("return %s\n", fst);
             case FuncDecl:
                 return String.format("func %s(%s)%s {\n%s}\n%s", value, str(params), t, str(fst), str(snd));
         }
@@ -97,6 +102,20 @@ public class Ast {
         return new Ast(Type.Unknown, Kind.FuncCall, fst, null, id);
     }
 
+    static class Pkg {
+        String name;
+        Ast prog;
+
+        Pkg(String name, Ast prog) {
+            this.name = name;
+            this.prog = prog;
+        }
+
+        @Override
+        public String toString() {
+            return "package " + name + "\n" + prog;
+        }
+    }
 }
 
 enum Type {
@@ -136,6 +155,7 @@ enum Kind {
     OpMulInt,
     UnMinusInt,
     AssignStmt,
+    RetStmt,
     IfStmt,
     FuncDecl,
     FuncCall,

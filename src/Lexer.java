@@ -6,8 +6,10 @@ import java.util.Set;
 
 public class Lexer {
     static Set<String> keywords = new HashSet<>(Arrays.asList(
+            "package",
             "func",
             "if",
+            "return",
             "bool",
             "int",
             "string"

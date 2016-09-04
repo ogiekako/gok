@@ -9,8 +9,8 @@ public class Main {
 
     public void compile(String input) {
         List<Token> tokens = new Lexer().lex(input);
-        Ast ast = new Parser().parse(tokens);
-        new Emit().emit(ast);
+        Ast.Pkg pkg = new Parser().parse(tokens);
+        new Emit(pkg).emit();
     }
 
 }

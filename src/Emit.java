@@ -3,15 +3,25 @@ import java.util.List;
 
 public class Emit {
 
-    public void emit(Ast a) {
+    Ast.Pkg pkg;
+    Emit(Ast.Pkg pkg) {
+        this.pkg = pkg;
+    }
+
+    public void emit() {
         output(".data");
         output("true: .asciiz \"true\"");
         output("false: .asciiz \"false\"");
-        genData(a);
+        genData(pkg.prog);
         output(".text");
-        genFunc(a);
+        genFunc(pkg.prog);
         int print_int = 1, print_string = 4, exit = 10;
-        switch (a.t) {
+        // Call main
+        output(
+                "main:",
+                "jal " + pkg.name + "_" + mainLabel
+        );
+        switch (pkg.prog.t) {
             case Void:
                 break;
             case Bool:
@@ -32,7 +42,7 @@ public class Emit {
                 genSyscall(print_string);
                 break;
             default:
-                throw  Err.format("Unknown type: %s", a.t);
+                throw Err.format("Unknown type: %s", pkg.prog.t);
         }
         genSyscall(exit);
     }
@@ -50,18 +60,19 @@ public class Emit {
         if (a.snd != null) genData(a.snd);
     }
 
+    String mainLabel;
     int sp;
     HashMap<String, Integer> paramOffset = new HashMap<>();
     HashMap<String, Integer> tempOffset = new HashMap<>();
+
     private void genFunc(Ast a) {
         if (a.kind != Kind.FuncDecl) {
             throw new IllegalArgumentException(String.format("Expected %s, but was %s. Ast:\n%s", Kind.FuncDecl, a.kind, a));
         }
         if (a.value.equals("main")) {
-            output("main:");
-        } else {
-            output(a.value + ":");
+            mainLabel = (String) a.value;
         }
+        output(pkg.name + "_" + a.value + ":");
 
         genParamOffset(a.params);
 
@@ -75,12 +86,6 @@ public class Emit {
         output("add $sp, $sp, " + sp);
 
         genBody(a.fst);
-        output("add $sp, $sp, " + (-sp));
-        output("lw $ra, 0($sp)");
-
-        if (!a.value.equals("main")) {
-            output("jr $ra");
-        }
 
         if (a.snd != null) {
             genFunc(a.snd);
@@ -90,7 +95,7 @@ public class Emit {
     // (a, b int)  a: $fp + 12,  b: $fp + 8   (old fp: $fp + 4)
     private void genParamOffset(List<Param> params) {
         int t = 8;
-        for(int i=params.size() - 1;i>=0; i--) {
+        for (int i = params.size() - 1; i >= 0; i--) {
             paramOffset.put(params.get(i).id, t);
             t += 4;
         }
@@ -114,7 +119,7 @@ public class Emit {
         if (a == null) return;
         switch (a.kind) {
             case ValBool:
-                output("li $a0, " + ((Boolean)(a.value) ? 1 : 0));
+                output("li $a0, " + ((Boolean) (a.value) ? 1 : 0));
                 return;
             case ValInt:
                 output("li $a0, " + a.value);
@@ -196,11 +201,17 @@ public class Emit {
                         "sw $fp, 0($sp)",
                         "addi $sp, $sp, -4",
 
-                        "jal " + a.value, // $ra is set.
+                        "jal " + pkg.name + "_" + a.value, // $ra is set.
 
                         "lw $fp, 4($sp)",
                         "addi $sp, $sp, 8"
                 );
+                return;
+            case RetStmt:
+                genBody(a.fst);
+                output("add $sp, $sp, " + (-sp));
+                output("lw $ra, 0($sp)");
+                output("jr $ra");
                 return;
             default:
                 throw new IllegalArgumentException("Unknown kind: " + a.kind);

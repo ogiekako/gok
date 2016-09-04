@@ -22,6 +22,7 @@ public class LexerTest {
                 "(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (RParen, )); (WhiteSpace,  ); (Keyword, string); (WhiteSpace,  ); (LBrace, {); (RBrace, })");
         testTokenize2("func f() bool {}",
                 "(Keyword, func); (WhiteSpace,  ); (Id, f); (LParen, (); (RParen, )); (WhiteSpace,  ); (Keyword, bool); (WhiteSpace,  ); (LBrace, {); (RBrace, })");
+        testTokenize2("package main", "(Keyword, package); (WhiteSpace,  ); (Id, main)");
     }
 
     private void testTokenize2(String input, String tokensStr) {

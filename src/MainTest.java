@@ -3,17 +3,18 @@ import org.junit.Test;
 public class MainTest {
 
     void testMain(String input) {
-        test("func main() string {\n" + input + "\n}");
+        testNoPkg("func main() string {\n" + input + "\n}");
     }
 
-    void test(String input){
+    void testNoPkg(String input){
+        input = "package main\n" + input;
         System.err.println("testing: " + input);
         new Main().compile(input);
     }
 
     @Test
     public void testCompile() {
-        testMain("true");
+        testMain("return true");
         testMain("false");
         testMain("\"A\"");
         testMain("\"Hello, World!\\n\"");
@@ -26,8 +27,8 @@ public class MainTest {
         testMain("(-1+ + - +2)*3");
         testMain("v:=1\nv");
         testMain("v:=0\nif 1 < 2 {\nv:=v+1\n}\nv");
-        test("func f() {\n}\nfunc main(){}");
-        test("func f(i int) int {\ni\n}\nfunc main() int {\nf(42)\n}");
-        test("func f(i bool) bool {\ni\n}\nfunc main() bool {\nf(true)\n}");
+        testNoPkg("func f() {\n}\nfunc main(){}");
+        testNoPkg("func f(i int) int {\ni\n}\nfunc main() int {\nf(42)\n}");
+        testNoPkg("func f(i bool) bool {\ni\n}\nfunc main() bool {\nf(true)\n}");
     }
 }
