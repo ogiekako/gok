@@ -1,3 +1,8 @@
+import ast.Ast;
+import ast.Param;
+import ast.Type;
+import utils.Err;
+
 import java.util.ArrayList;
 import java.util.List;
 

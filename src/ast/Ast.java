@@ -1,3 +1,5 @@
+package ast;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -102,11 +104,11 @@ public class Ast {
         return new Ast(Type.Unknown, Kind.FuncCall, fst, null, id);
     }
 
-    static class Pkg {
+    public static class Pkg {
         String name;
         Ast prog;
 
-        Pkg(String name, Ast prog) {
+        public Pkg(String name, Ast prog) {
             this.name = name;
             this.prog = prog;
         }
@@ -114,33 +116,6 @@ public class Ast {
         @Override
         public String toString() {
             return "package " + name + "\n" + prog;
-        }
-    }
-}
-
-enum Type {
-    Bool(" bool"),
-    Int(" int"),
-    Str(" string"),
-    Void(""),
-    Unknown(" ???"),;
-    String name;
-
-    Type(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    static Type of(String s) {
-        switch (s) {
-            case "bool": return Bool;
-            case "int": return Int;
-            case "string": return Str;
-            default: throw Err.format("Unknown type name %s", s);
         }
     }
 }

@@ -1,10 +1,14 @@
+package ast;
+
+import utils.Err;
+
 import java.util.HashMap;
 import java.util.List;
 
 public class Emit {
 
     Ast.Pkg pkg;
-    Emit(Ast.Pkg pkg) {
+    public Emit(Ast.Pkg pkg) {
         this.pkg = pkg;
     }
 

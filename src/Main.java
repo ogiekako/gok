@@ -1,3 +1,6 @@
+import ast.Ast;
+import ast.Emit;
+
 import java.util.List;
 import java.util.Scanner;
 
