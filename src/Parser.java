@@ -42,7 +42,7 @@ public class Parser {
 
     /*
     Pkg       -> package id; Prog
-    Prog      -> Body | func id Signature { Body? }; Prog
+    Prog      -> func id Signature { Body? }; Prog
     Signature -> ( id "int" ) "int"
     Body      -> E | id := E; Body | if E { Body } Body | return E
     E -> str | Plus < E | Plus
@@ -56,7 +56,7 @@ public class Parser {
         return new Ast.Pkg(packageName, Prog());
     }
 
-    private Ast Prog() {
+    Ast Prog() {
         if (ts[p].c == Cls.EOF) return null;
         if (ts[p].c == Cls.Keyword && ts[p].s.equals("func")) {
             p++;
@@ -79,9 +79,8 @@ public class Parser {
             checkRead(Cls.RBrace);
             Ast snd = Prog();
             return Ast.funcDecl(funcName, params, t, fst, snd);
-        } else {
-            return Body();
         }
+        throw Err.format("%s was not expected for Prog.", ts[p]);
     }
 
     private Ast Body() {

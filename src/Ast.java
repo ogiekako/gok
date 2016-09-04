@@ -81,7 +81,7 @@ public class Ast {
             case AssignStmt:
                 return String.format("%s := %s\n%s", value, fst, snd);
             case IfStmt:
-                return String.format("if %s {\n%s\n}\n%s", cond, fst, snd);
+                return String.format("if %s {\n%s}\n%s", cond, fst, snd);
             case RetStmt:
                 return String.format("return %s\n", fst);
             case FuncDecl:
